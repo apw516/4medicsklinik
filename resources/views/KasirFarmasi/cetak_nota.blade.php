@@ -60,9 +60,9 @@
     <div class="nota-wrapper">
         <!-- Header Klinik / Rumah Sakit -->
         <div class="text-center mb-2">
-            <h5 class="fw-bold m-0">{{ $mt_client->nama_klinik}}</h5>
-            <small class="d-block">{{ $mt_client->alamat}}</small>
-            <small class="d-block">Telp: {{ $mt_client->telp}}</small>
+            <h5 class="fw-bold m-0">{{ $mt_client->nama_klinik }}</h5>
+            <small class="d-block">{{ $mt_client->alamat }}</small>
+            <small class="d-block">Telp: {{ $mt_client->telp }}</small>
             <div class="border-dashed my-2"></div>
             <h6 class="fw-bold text-uppercase m-0">BUKTI PEMBAYARAN</h6>
         </div>
@@ -89,70 +89,26 @@
 
         <div class="border-dashed my-2"></div>
 
-        <!-- Tabel Detail Item -->
+        <!-- Tabel Ringkasan Tagihan -->
         <table class="w-100 mb-2">
             <thead>
                 <tr class="border-dashed">
-                    <th class="text-start pb-1">Item</th>
-                    <th class="text-center pb-1" style="width: 40px;">Qty</th>
-                    <th class="text-end pb-1" style="width: 80px;">Harga</th>
-                    <th class="text-end pb-1" style="width: 90px;">Subtotal</th>
+                    <th class="text-start pb-1">Deskripsi</th>
+                    <th class="text-end pb-1" style="width: 120px;">Total</th>
                 </tr>
             </thead>
             <tbody>
-                @php $total = 0; @endphp
-                @foreach ($billingDetails as $item)
-                    @php
-                        $rawNama = $item->nama_tindakan ?? ($item->nama_obat ?? 'Item Tanpa Nama');
-                        $jenisItem = strtolower($item->jenis_item ?? '');
-
-                        // Logika Sensor Obat (Menyisakan awal dan tengah, sisanya disensor '*')
-                        if ($jenisItem === 'obat' && !empty($rawNama)) {
-                            $words = explode(' ', trim($rawNama));
-                            $count = count($words);
-
-                            if ($count === 1) {
-                                // 1 Kata: Tampilkan 3 karakter awal, sisanya '*'
-                                $len = strlen($words[0]);
-                                $namaItem = $len > 3 
-                                    ? substr($words[0], 0, 3) . str_repeat('*', $len - 3) 
-                                    : $words[0];
-                            } elseif ($count === 2) {
-                                // 2 Kata: Kata ke-1 tampil utuh, Kata ke-2 disensor
-                                $namaItem = $words[0] . ' ' . str_repeat('*', strlen($words[1]));
-                            } else {
-                                // 3 Kata atau Lebih: Kata ke-1 dan tengah/ke-2 tampil, sisanya '*'
-                                $middleIndex = (int) floor($count / 2);
-                                $maskedWords = [];
-
-                                foreach ($words as $idx => $word) {
-                                    if ($idx === 0 || $idx === $middleIndex) {
-                                        $maskedWords[] = $word;
-                                    } else {
-                                        $maskedWords[] = str_repeat('*', strlen($word));
-                                    }
-                                }
-                                $namaItem = implode(' ', $maskedWords);
-                            }
-                        } else {
-                            $namaItem = $rawNama;
-                        }
-
+                @php
+                    $total = $billingDetails->sum(function ($item) {
                         $qty = (float) ($item->qty ?? 0);
                         $harga = (float) ($item->harga ?? 0);
-                        $subtotal = (float) ($item->subtotal ?? $qty * $harga);
-                        $total += $subtotal;
-                    @endphp
-                    <tr>
-                        <td colspan="4" class="pt-2 fw-bold">{{ $namaItem }}</td>
-                    </tr>
-                    <tr>
-                        <td class="text-muted ps-2"><small>({{ ucfirst($item->jenis_item ?? 'item') }})</small></td>
-                        <td class="text-center align-top">{{ $qty }}</td>
-                        <td class="text-end align-top">{{ number_format($harga, 0, ',', '.') }}</td>
-                        <td class="text-end align-top">{{ number_format($subtotal, 0, ',', '.') }}</td>
-                    </tr>
-                @endforeach
+                        return (float) ($item->subtotal ?? $qty * $harga);
+                    });
+                @endphp
+                <tr>
+                    <td class="pt-2 fw-bold">Total Rincian Pelayanan & Obat</td>
+                    <td class="pt-2 text-end align-top fw-bold">Rp {{ number_format($total, 0, ',', '.') }}</td>
+                </tr>
             </tbody>
         </table>
 
@@ -182,4 +138,5 @@
         }
     </script>
 </body>
+
 </html>

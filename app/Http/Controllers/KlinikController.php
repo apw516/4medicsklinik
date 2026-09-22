@@ -295,7 +295,6 @@ class KlinikController extends Controller
                                         // DD($kunjungan);
                                         $medResponse = $this->ssService->sendMedicationRequest($kunjungan, $item);
                                         $satusehatLog['medication_request'][] = $medResponse;
-
                                         if (isset($medResponse['status']) && $medResponse['status'] === true) {
                                             $satusehatMedId        = $medResponse['medication_id'] ?? null;
                                             $satusehatMedRequestId = $medResponse['id'] ?? null;

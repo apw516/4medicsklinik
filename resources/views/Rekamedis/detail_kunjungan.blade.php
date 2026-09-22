@@ -56,7 +56,7 @@
             @forelse($details as $idx => $row)
                 <tr>
                     <td class="text-center">{{ $idx + 1 }}</td>
-                    <td>{{ $row->nama_obat }}{{ $row->nama_tindakan }}</td>
+                    <td>{{ mb_substr($row->nama_obat, 0, 3) }} {{ $row->nama_tindakan }}</td>
                     <td class="text-center">{{ $row->qty }}</td>
                     <td class="text-end">Rp
                         @if ($row->harga_jual != '')

@@ -70,8 +70,7 @@
                             <select name="status" class="form-select form-select-sm">
                                 <option value="BELUM LUNAS"
                                     {{ request('status', 'BELUM LUNAS') == 'BELUM LUNAS' ? 'selected' : '' }}>Belum
-                                    dibayar
-                                    (Menunggu Pembayaran)</option>
+                                    dibayar (Menunggu Pembayaran)</option>
                                 <option value="lunas" {{ request('status') == 'lunas' ? 'selected' : '' }}>Lunas</option>
                                 <option value="batal" {{ request('status') == 'batal' ? 'selected' : '' }}>Batal</option>
                                 <option value="semua" {{ request('status') == 'semua' ? 'selected' : '' }}>Semua Status
@@ -153,7 +152,7 @@
                                                 data-id="{{ $item->id }}"
                                                 data-kunjungan-id="{{ $item->kunjungan_id }}" data-bs-toggle="modal"
                                                 data-bs-target="#modalDetailTagihan">
-                                                <i class="bi bi-receipt me-1"></i> Detail Tagihan
+                                                <i class="bi bi-receipt me-1"></i> Detail
                                             </button>
                                         </td>
                                     </tr>
@@ -216,6 +215,21 @@
                         <span id="detail-info-transaksi" class="d-block small mt-1"></span>
                     </div>
 
+                    <!-- Header Rincian & Tombol Tambah (Disembunyikan jika LUNAS) -->
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h6 class="mb-0 fw-bold"><i class="bi bi-list-check me-1"></i> Item Tindakan & Obat</h6>
+                        <div class="btn-group btn-group-sm section-tambah-item">
+                            <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal"
+                                data-bs-target="#modalTambahTindakan">
+                                <i class="bi bi-plus-circle me-1"></i> Tindakan
+                            </button>
+                            <button type="button" class="btn btn-outline-success" data-bs-toggle="modal"
+                                data-bs-target="#modalTambahObat">
+                                <i class="bi bi-plus-circle me-1"></i> Obat / Alkes
+                            </button>
+                        </div>
+                    </div>
+
                     <!-- Tabel Rincian Biaya -->
                     <div class="table-responsive mb-3">
                         <table class="table table-sm table-bordered">
@@ -275,6 +289,89 @@
         </div>
     </div>
 
+    <!-- Modal Tambah Tindakan -->
+    <div class="modal fade" id="modalTambahTindakan" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white py-2">
+                    <h6 class="modal-title"><i class="bi bi-plus-lg me-1"></i> Tambah Tindakan / Layanan</h6>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <form id="form-tambah-tindakan">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Pilih Tindakan</label>
+                            <select class="form-select form-select-sm" id="select-tindakan-id" name="tindakan_id"
+                                required>
+                                <option value="">-- Pilih Tindakan --</option>
+                            </select>
+                        </div>
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <label class="form-label small fw-bold">Jumlah (Qty)</label>
+                                <input type="number" class="form-control form-control-sm" name="qty"
+                                    id="qty-tindakan" value="1" min="1" required>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label small fw-bold">Harga (Rp)</label>
+                                <input type="number" class="form-control form-control-sm" name="harga"
+                                    id="harga-tindakan" required readonly>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer py-2">
+                        <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="modal"
+                            data-bs-target="#modalDetailTagihan">Batal</button>
+                        <button type="submit" class="btn btn-primary btn-sm"><i class="bi bi-check-lg me-1"></i>
+                            Tambahkan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Tambah Obat -->
+    <div class="modal fade" id="modalTambahObat" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white py-2">
+                    <h6 class="modal-title"><i class="bi bi-plus-lg me-1"></i> Tambah Obat / Alkes</h6>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <form id="form-tambah-obat">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Pilih Obat / Alkes</label>
+                            <select class="form-select form-select-sm" id="select-obat-id" name="obat_id" required>
+                                <option value="">-- Pilih Obat --</option>
+                            </select>
+                        </div>
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <label class="form-label small fw-bold">Jumlah (Qty)</label>
+                                <input type="number" class="form-control form-control-sm" name="qty" id="qty-obat"
+                                    value="1" min="1" required>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label small fw-bold">Harga Satuan (Rp)</label>
+                                <input type="number" class="form-control form-control-sm" name="harga"
+                                    id="harga-obat" required readonly>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer py-2">
+                        <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="modal"
+                            data-bs-target="#modalDetailTagihan">Batal</button>
+                        <button type="submit" class="btn btn-success btn-sm"><i class="bi bi-check-lg me-1"></i>
+                            Tambahkan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const detailButtons = document.querySelectorAll('.btn-detail-tagihan');
@@ -286,120 +383,198 @@
             const statusBadge = document.getElementById('detail-status-pembayaran');
             const alertLunas = document.getElementById('alert-pembayaran-lunas');
             const infoTransaksi = document.getElementById('detail-info-transaksi');
+            const sectionTambahItem = document.querySelectorAll('.section-tambah-item');
 
-            // Event saat tombol 'Detail Tagihan' diklik
+            let currentTagihanId = null;
+            let currentKunjunganId = null;
+
+            // Load Master Data Tindakan & Obat untuk Select Option
+            function loadMasterData() {
+                fetch(`{{ url('/master/tindakan/list') }}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        let options = '<option value="">-- Pilih Tindakan --</option>';
+                        data.forEach(item => {
+                            options +=
+                                `<option value="${item.id}" data-harga="${item.harga}">${item.nama_tindakan} - Rp ${Number(item.harga).toLocaleString('id-ID')}</option>`;
+                        });
+                        document.getElementById('select-tindakan-id').innerHTML = options;
+                    });
+
+                fetch(`{{ url('/master/obat/list') }}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        let options = '<option value="">-- Pilih Obat --</option>';
+                        data.forEach(item => {
+                            options +=
+                                `<option value="${item.id}" data-harga="${item.harga}">${item.nama_obat} - Rp ${Number(item.harga).toLocaleString('id-ID')}</option>`;
+                        });
+                        document.getElementById('select-obat-id').innerHTML = options;
+                    });
+            }
+            loadMasterData();
+
+            // Set otomatis harga saat item dipilih
+            document.getElementById('select-tindakan-id').addEventListener('change', function() {
+                const selected = this.options[this.selectedIndex];
+                document.getElementById('harga-tindakan').value = selected.getAttribute('data-harga') || 0;
+            });
+
+            document.getElementById('select-obat-id').addEventListener('change', function() {
+                const selected = this.options[this.selectedIndex];
+                document.getElementById('harga-obat').value = selected.getAttribute('data-harga') || 0;
+            });
+
+            // Fetch Detail Tagihan
+            function loadDetailTagihan(id, kunjunganId) {
+                tbodyRincian.innerHTML =
+                    `<tr><td colspan="4" class="text-center text-muted"><div class="spinner-border spinner-border-sm text-primary me-2"></div>Memuat data rincian...</td></tr>`;
+
+                fetch(`{{ url('/kasir/detail') }}/${id}/${kunjunganId}`)
+                    .then(response => {
+                        if (!response.ok) throw new Error('Gagal mengambil data dari server.');
+                        return response.json();
+                    })
+                    .then(data => {
+                        document.getElementById('detail-nama-pasien').innerText = data.pasien.nama;
+                        document.getElementById('detail-no-rm').innerText = data.pasien.no_rm;
+                        document.getElementById('detail-no-reg').innerText = data.no_registrasi;
+                        document.getElementById('detail-poli').innerText = data.poli.nama_poli;
+
+                        if (data.is_lunas) {
+                            statusBadge.className = 'badge bg-success fs-6';
+                            statusBadge.innerText = 'LUNAS';
+                            alertLunas.classList.remove('d-none');
+                            sectionTambahItem.forEach(el => el.classList.add('d-none'));
+
+                            if (data.detail_pembayaran) {
+                                const tgl = data.detail_pembayaran.tanggal_bayar ? new Date(
+                                    data.detail_pembayaran.tanggal_bayar).toLocaleString('id-ID') : '-';
+                                infoTransaksi.innerText =
+                                    `Metode: ${data.detail_pembayaran.metode_pembayaran.toUpperCase()} | Nominal: Rp ${Number(data.detail_pembayaran.jumlah_bayar).toLocaleString('id-ID')} | Waktu: ${tgl}`;
+                            }
+
+                            inputJumlahBayar.disabled = true;
+                            selectMetodePembayaran.disabled = true;
+                            btnProsesPembayaran.disabled = true;
+                        } else {
+                            statusBadge.className = 'badge bg-danger fs-6';
+                            statusBadge.innerText = 'BELUM DIBAYAR';
+                            alertLunas.classList.add('d-none');
+                            sectionTambahItem.forEach(el => el.classList.remove('d-none'));
+
+                            inputJumlahBayar.disabled = false;
+                            selectMetodePembayaran.disabled = false;
+                            btnProsesPembayaran.disabled = false;
+                        }
+
+                        let htmlRows = '';
+                        if (data.rincian && data.rincian.length > 0) {
+                            data.rincian.forEach(item => {
+                                htmlRows += `
+                                <tr>
+                                    <td>${item.nama_layanan}</td>
+                                    <td class="text-center">${item.qty}</td>
+                                    <td class="text-end">Rp ${Number(item.harga).toLocaleString('id-ID')}</td>
+                                    <td class="text-end">Rp ${Number(item.subtotal).toLocaleString('id-ID')}</td>
+                                </tr>`;
+                            });
+                        } else {
+                            htmlRows =
+                                `<tr><td colspan="4" class="text-center text-muted">Belum ada rincian tindakan atau resep obat.</td></tr>`;
+                        }
+
+                        tbodyRincian.innerHTML = htmlRows;
+                        document.getElementById('detail-total-tagihan').innerText = 'Rp ' + Number(data.total)
+                            .toLocaleString('id-ID');
+
+                        if (!data.is_lunas) {
+                            inputJumlahBayar.value = data.total;
+                        } else if (data.detail_pembayaran) {
+                            inputJumlahBayar.value = data.detail_pembayaran.jumlah_bayar;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        tbodyRincian.innerHTML =
+                            `<tr><td colspan="4" class="text-center text-danger">Gagal memuat rincian tagihan.</td></tr>`;
+                    });
+            }
+
+            // Event tombol 'Detail Tagihan'
             detailButtons.forEach(button => {
                 button.addEventListener('click', function() {
-                    const kunjunganId = this.getAttribute('data-id');
-                    const kunjunganId2 = this.getAttribute('data-kunjungan-id');
+                    currentTagihanId = this.getAttribute('data-id');
+                    currentKunjunganId = this.getAttribute('data-kunjungan-id');
 
-                    // Set ID & Action Form
-                    document.getElementById('detail-kunjungan-id').value = kunjunganId;
+                    document.getElementById('detail-kunjungan-id').value = currentTagihanId;
                     formPembayaran.action = "{{ route('kasir.bayar') }}";
 
-                    // Reset UI ke kondisi Loading & Enable sementara
-                    tbodyRincian.innerHTML =
-                        `<tr><td colspan="4" class="text-center text-muted"><div class="spinner-border spinner-border-sm text-primary me-2"></div>Memuat data rincian...</td></tr>`;
-                    document.getElementById('detail-nama-pasien').innerText = '-';
-                    document.getElementById('detail-no-rm').innerText = '-';
-                    document.getElementById('detail-no-reg').innerText = '-';
-                    document.getElementById('detail-poli').innerText = '-';
-                    document.getElementById('detail-total-tagihan').innerText = 'Rp 0';
-
-                    statusBadge.className = 'badge bg-secondary fs-6';
-                    statusBadge.innerText = 'MEMUAT...';
-                    alertLunas.classList.add('d-none');
-                    infoTransaksi.innerText = '';
-
-                    inputJumlahBayar.value = '';
-                    inputJumlahBayar.disabled = false;
-                    selectMetodePembayaran.disabled = false;
-                    btnProsesPembayaran.disabled = false;
-
-                    // Fetch Data dari API
-                    fetch(`{{ url('/kasir/detail') }}/${kunjunganId}/${kunjunganId2}`)
-                        .then(response => {
-                            if (!response.ok) throw new Error(
-                                'Gagal mengambil data dari server.');
-                            return response.json();
-                        })
-                        .then(data => {
-                            // Populate Info Pasien
-                            document.getElementById('detail-nama-pasien').innerText = data
-                                .pasien.nama;
-                            document.getElementById('detail-no-rm').innerText = data.pasien
-                                .no_rm;
-                            document.getElementById('detail-no-reg').innerText = data
-                                .no_registrasi;
-                            document.getElementById('detail-poli').innerText = data.poli
-                                .nama_poli;
-
-                            // Render Status Pembayaran & Control Disabled State
-                            if (data.is_lunas) {
-                                statusBadge.className = 'badge bg-success fs-6';
-                                statusBadge.innerText = 'LUNAS';
-
-                                // Tampilkan alert lunas & info transaksi
-                                alertLunas.classList.remove('d-none');
-                                if (data.detail_pembayaran) {
-                                    const tgl = data.detail_pembayaran.tanggal_bayar ? new Date(
-                                            data.detail_pembayaran.tanggal_bayar)
-                                        .toLocaleString('id-ID') : '-';
-                                    infoTransaksi.innerText =
-                                        `Metode: ${data.detail_pembayaran.metode_pembayaran.toUpperCase()} | Nominal: Rp ${Number(data.detail_pembayaran.jumlah_bayar).toLocaleString('id-ID')} | Waktu: ${tgl}`;
-                                }
-
-                                // Disable input & tombol simpan
-                                inputJumlahBayar.disabled = true;
-                                selectMetodePembayaran.disabled = true;
-                                btnProsesPembayaran.disabled = true;
-                            } else {
-                                statusBadge.className = 'badge bg-danger fs-6';
-                                statusBadge.innerText = 'BELUM DIBAYAR';
-
-                                inputJumlahBayar.disabled = false;
-                                selectMetodePembayaran.disabled = false;
-                                btnProsesPembayaran.disabled = false;
-                            }
-
-                            // Render Item Tagihan
-                            let htmlRows = '';
-                            if (data.rincian && data.rincian.length > 0) {
-                                data.rincian.forEach(item => {
-                                    htmlRows += `
-                                    <tr>
-                                        <td>${item.nama_layanan}</td>
-                                        <td class="text-center">${item.qty}</td>
-                                        <td class="text-end">Rp ${Number(item.harga).toLocaleString('id-ID')}</td>
-                                        <td class="text-end">Rp ${Number(item.subtotal).toLocaleString('id-ID')}</td>
-                                    </tr>
-                                `;
-                                });
-                            } else {
-                                htmlRows =
-                                    `<tr><td colspan="4" class="text-center text-muted">Belum ada rincian tindakan atau resep obat.</td></tr>`;
-                            }
-
-                            tbodyRincian.innerHTML = htmlRows;
-                            document.getElementById('detail-total-tagihan').innerText = 'Rp ' +
-                                Number(data.total).toLocaleString('id-ID');
-
-                            // Fill nominal jika belum dibayar
-                            if (!data.is_lunas) {
-                                inputJumlahBayar.value = data.total;
-                            } else if (data.detail_pembayaran) {
-                                inputJumlahBayar.value = data.detail_pembayaran.jumlah_bayar;
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                            tbodyRincian.innerHTML =
-                                `<tr><td colspan="4" class="text-center text-danger">Gagal memuat rincian tagihan.</td></tr>`;
-                        });
+                    loadDetailTagihan(currentTagihanId, currentKunjunganId);
                 });
             });
 
-            // Trigger Submit Form
+            // Submit Tambah Tindakan via AJAX
+            document.getElementById('form-tambah-tindakan').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const formData = new FormData(this);
+                formData.append('tagihan_id', currentTagihanId);
+                formData.append('kunjungan_id', currentKunjunganId);
+
+                fetch("{{ route('kasir.tambah-tindakan') }}", {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: formData
+                    })
+                    .then(res => res.json())
+                    .then(res => {
+                        if (res.success) {
+                            const modal = bootstrap.Modal.getInstance(document.getElementById(
+                                'modalTambahTindakan'));
+                            modal.hide();
+                            loadDetailTagihan(currentTagihanId, currentKunjunganId);
+                            const modalDetail = new bootstrap.Modal(document.getElementById(
+                                'modalDetailTagihan'));
+                            modalDetail.show();
+                        } else {
+                            alert(res.message || 'Gagal menambahkan tindakan.');
+                        }
+                    });
+            });
+
+            // Submit Tambah Obat via AJAX
+            document.getElementById('form-tambah-obat').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const formData = new FormData(this);
+                formData.append('tagihan_id', currentTagihanId);
+                formData.append('kunjungan_id', currentKunjunganId);
+
+                fetch("{{ route('kasir.tambah-obat') }}", {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: formData
+                    })
+                    .then(res => res.json())
+                    .then(res => {
+                        if (res.success) {
+                            const modal = bootstrap.Modal.getInstance(document.getElementById(
+                                'modalTambahObat'));
+                            modal.hide();
+                            loadDetailTagihan(currentTagihanId, currentKunjunganId);
+                            const modalDetail = new bootstrap.Modal(document.getElementById(
+                                'modalDetailTagihan'));
+                            modalDetail.show();
+                        } else {
+                            alert(res.message || 'Gagal menambahkan obat.');
+                        }
+                    });
+            });
+
+            // Trigger Submit Form Pembayaran
             btnProsesPembayaran.addEventListener('click', function() {
                 if (formPembayaran.checkValidity()) {
                     formPembayaran.submit();

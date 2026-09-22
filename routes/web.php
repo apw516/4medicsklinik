@@ -11,13 +11,12 @@ use App\Helpers\LicenseHelper;
 
 Route::get('/app-activation', function (\Illuminate\Http\Request $request) {
     $devKey = $request->query('key');
-    $expired = $request->query('expired'); // Format YYYY-MM-DD
+    $expired = $request->query('expired'); 
 
     // Kunci Pengaman agar Klinik tidak bisa tebak
     if ($devKey !== 'KunciSuperDev2026') {
-        abort(404); // Pura-pura halaman tidak ditemukan
+        abort(404); 
     }
-
     if (!$expired) {
         return "Masukkan tanggal expired! Contoh: ?key=KunciSuperDev2026&expired=2026-12-31";
     }
@@ -109,8 +108,10 @@ Route::post('/pasien.index', [PendaftaranController::class, 'storePasien'])->nam
 Route::get('/caripasienpasien', [PendaftaranController::class, 'caripasien'])->name('caripasien');
 Route::post('/ambil_form_pendaftaran', [PendaftaranController::class, 'formpendaftaran'])->name('ambil_form_pendaftaran');
 Route::post('/pendaftaran/store', [PendaftaranController::class, 'storependaftaran'])->name('pendaftaran.store');
+Route::post('/pasien/hapus', [PendaftaranController::class, 'hapuspasien'])->name('pasien.hapus');
 Route::post('/ambil_form_editpasien', [PendaftaranController::class, 'ambilFormEditPasien'])->name('ambil_form_editpasien');
-
+Route::get('/pasien/get-kunjungan/{id}', [PendaftaranController::class, 'getKunjungan']);
+Route::post('/pasien/update-kunjungan/{id}', [PendaftaranController::class, 'updateKunjungan']);
 
 // Route Halaman Utama Kasir
 Route::get('/indexfarmasi', [KasirFarmasiController::class, 'indexfarmasi'])->middleware('auth')->name('indexfarmasi');
@@ -128,3 +129,9 @@ Route::post('/ambil_riwayat_pembayaran', [KasirFarmasiController::class, 'ambil_
 
 Route::get('/detail-pembayaran/{id}', [KasirFarmasiController::class, 'detailPembayaran'])->name('detail-pembayaran');    // Route untuk mencetak nota/struk pembayaran
 Route::get('/cetak-pembayaran/{id}', [KasirFarmasiController::class, 'cetakPembayaran'])->name('cetak-pembayaran');
+
+
+Route::post('/kasir/tambah-tindakan', [KasirFarmasiController::class, 'tambahTindakan'])->name('kasir.tambah-tindakan');
+Route::post('/kasir/tambah-obat', [KasirFarmasiController::class, 'tambahObat'])->name('kasir.tambah-obat');
+Route::get('/master/tindakan/list', [KasirFarmasiController::class, 'getTindakanList']);
+Route::get('/master/obat/list', [KasirFarmasiController::class, 'getObatList']);

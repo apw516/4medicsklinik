@@ -1257,7 +1257,6 @@ class SatuSehatService
             $response = Http::withToken($accessToken)
                 ->withHeaders(['Content-Type' => 'application/json'])
                 ->post("{$baseUrl}/Procedure", $payload);
-
             if ($response->successful()) {
                 return [
                     'status' => true,
@@ -1293,7 +1292,9 @@ class SatuSehatService
             // CEK & BRIDGING MEDICATION ID JIKA KOSONG
             // ==========================================
             $obatId       = $itemObat['obat_id'] ?? null;
-            $medicationId = $itemObat['satusehat_medication_id'] ?? null;
+            $medicationId = '';
+            // $obatId       = $itemObat['obat_id'] ?? null;
+            // $medicationId = $itemObat['satusehat_medication_id'] ?? null;
 
             if (!$medicationId && $obatId) {
                 $medicationId = DB::table('master_obats')
@@ -1368,14 +1369,14 @@ class SatuSehatService
                 $medicationId = $resMedication->json('id');
 
                 // Simpan ID baru ke tabel master_obats
-                if ($obatId && $medicationId) {
-                    DB::table('master_obats')
-                        ->where('id', $obatId)
-                        ->update([
-                            'satusehat_medication_id' => $medicationId,
-                            'updated_at'              => now()
-                        ]);
-                }
+                // if ($obatId && $medicationId) {
+                //     DB::table('master_obats')
+                //         ->where('id', $obatId)
+                //         ->update([
+                //             'satusehat_medication_id' => $medicationId,
+                //             'updated_at'              => now()
+                //         ]);
+                // }
             }
 
             // ==========================================
@@ -1463,7 +1464,8 @@ class SatuSehatService
     }
     public function sendMedicationDispense($kunjungan, $itemObat)
     {
-        $locationId = '03b9c8dc-5e06-4fba-b4d7-172e382dd877 ';
+        $DATLOC = db::select('select * from locations where client_id = ? and nama_lokasi = ?',[auth()->user()->client_id,'FARMASI']);
+        $locationId = $DATLOC[0]->satusehat_location_id;
         // $locationId = 'ed180ca4-4af0-4315-ab59-fdf99e71dd4e';
          
         if (!$locationId) {

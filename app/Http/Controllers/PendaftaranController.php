@@ -51,6 +51,8 @@ class PendaftaranController extends Controller
     {
         $tglAwal = $request->tgl_awal;
         $tglAkhir = $request->tgl_akhir;
+        $unit = Location::where('client_id', auth()->user()->client_id)->get();
+        $dokter = Dokter::where('client_id', auth()->user()->client_id)->get();
 
         $kunjungans = DB::table('kunjungans')
             // ->leftJoin('pembayarans', 'kunjungans.id', '=', 'pembayarans.kunjungan_id')
@@ -73,8 +75,8 @@ class PendaftaranController extends Controller
             )
             ->orderBy('kunjungans.created_at', 'DESC')
             ->get();
-        
-        return view('Rekamedis.tabel_riwayat_kunjungan', compact('kunjungans'));
+
+        return view('Rekamedis.tabel_riwayat_kunjungan', compact('kunjungans','dokter','unit'));
     }
     public function detailKunjungan($id)
     {
@@ -509,8 +511,8 @@ class PendaftaranController extends Controller
         $rm = $request->rm;
         $pasien = Pasien::where('no_rm', $rm)->get()->first();
         // $unit = Unit::get();
-        $unit = Location::where('client_id',auth()->user()->client_id)->get();
-        $dokter = Dokter::where('client_id',auth()->user()->client_id)->get();
+        $unit = Location::where('client_id', auth()->user()->client_id)->get();
+        $dokter = Dokter::where('client_id', auth()->user()->client_id)->get();
         $data_kunjungan = Kunjungan::with(['unit', 'dokter'])
             ->where('pasien_id', $pasien->id)
             ->where('status_kunjungan', '!=', 'BATAL')
@@ -696,5 +698,70 @@ class PendaftaranController extends Controller
             'pasien',
             'listProvinsi'
         ]));
+    }
+    public function hapuspasien(Request $request)
+    {
+        // Validasi input
+
+
+        try {
+            // Cari dan hapus data
+            $pasien = Pasien::where('id', $request->rm)->first();
+
+            if ($pasien) {
+                $pasien->delete();
+                return response()->json([
+                    'status'  => 'success',
+                    'message' => 'Data pasien berhasil dihapus.',
+                ], 200);
+            }
+
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Data pasien tidak ditemukan.',
+            ], 404);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Gagal menghapus data: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+    public function getKunjungan($id)
+    {
+        $kunjungan = Kunjungan::join('pasiens', 'kunjungans.pasien_id', '=', 'pasiens.id')
+            ->select('kunjungans.*', 'pasiens.nama_lengkap')
+            ->where('kunjungans.id', $id)
+            ->first();
+        
+        if (!$kunjungan) {
+            return response()->json(['message' => 'Data tidak ditemukan'], 404);
+        }
+
+        return response()->json($kunjungan);
+    }
+
+    public function updateKunjungan(Request $request, $id)
+    {
+        $request->validate([
+            'tgl_kunjungan' => 'required|date',
+            'poli_id' => 'required',
+            'dokter_id' => 'required',
+            'keluhan_utama' => 'required',
+            'status_kunjungan' => 'required|in:ANTRIAN,SELESAI,BATAL',
+        ]);
+        $kunjungan = Kunjungan::findOrFail($id);
+        // Cegah edit jika status pembayaran sudah LUNAS (opsional)
+        if (strtoupper($kunjungan->status_pembayaran) === 'LUNAS') {
+            return response()->json(['message' => 'Kunjungan yang sudah LUNAS tidak dapat diubah.'], 422);
+        }
+        $kunjungan->update([
+            'tgl_kunjungan' => $request->tgl_kunjungan,
+            'poli_id' => $request->poli_id,
+            'dokter_id' => $request->dokter_id,
+            'keluhan_utama' => $request->keluhan_utama,
+            'status_kunjungan' => $request->status_kunjungan,
+        ]);
+        return response()->json(['message' => 'Data kunjungan berhasil diperbarui.']);
     }
 }

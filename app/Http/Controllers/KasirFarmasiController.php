@@ -483,7 +483,180 @@ class KasirFarmasiController extends Controller
 
         // 2. Ambil header informasi pembayaran/pasien utama
         $header = $billingDetails->first();
-        $mt_client = db::table('mt_client')->where('id',auth()->user()->client_id)->first();
-        return view('KasirFarmasi.cetak_nota', compact('billingDetails', 'header','mt_client'));
+        $mt_client = db::table('mt_client')->where('id', auth()->user()->client_id)->first();
+        return view('KasirFarmasi.cetak_nota', compact('billingDetails', 'header', 'mt_client'));
+    }
+    /**
+     * Mengambil daftar master tindakan untuk dropdown modal.
+     */
+    public function getTindakanList(Request $request)
+    {
+        // Sesuaikan nama tabel dan kolom master tindakan Anda
+        $tindakan = DB::table('master_tarifs')
+            ->select('id', 'nama_tindakan', 'harga')
+            ->where('client_id', auth()->user()->client_id) // opsional jika ada flag aktif
+            ->orderBy('nama_tindakan', 'asc')
+            ->get();
+
+        return response()->json($tindakan);
+    }
+
+    /**
+     * Mengambil daftar master obat/alkes untuk dropdown modal.
+     */
+    public function getObatList(Request $request)
+    {
+        // Sesuaikan nama tabel dan kolom master obat Anda
+        $obat = DB::table('master_obats')
+            ->select('id', 'nama_obat', 'harga_jual as harga')
+            ->where('stok', '>', 0) // hanya tampilkan yang stoknya ada
+            ->orderBy('nama_obat', 'asc')
+            ->get();
+
+        return response()->json($obat);
+    }
+
+    /**
+     * Menambahkan item tindakan/layanan ke detail tagihan pasien.
+     */
+    public function tambahTindakan(Request $request)
+    {
+        $request->validate([
+            'tagihan_id'   => 'required',
+            'kunjungan_id' => 'required',
+            'tindakan_id'  => 'required',
+            'qty'          => 'required|numeric|min:1',
+            'harga'        => 'required|numeric|min:0',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            // 1. Ambil info tindakan dari master
+            $tindakan = DB::table('master_tarifs')->where('id', $request->tindakan_id)->first();
+
+            if (!$tindakan) {
+                return response()->json(['success' => false, 'message' => 'Data tindakan tidak ditemukan.'], 404);
+            }
+
+            $subtotal = $request->qty * $request->harga;
+            // 2. Insert ke tabel rincian tagihan / detail tagihan
+            // Sesuaikan nama tabel detail tagihan Anda (misal: tagihan_detail / rincian_tagihan)
+            DB::table('billing_details')->insert([
+                'pembayaran_id'   => $request->tagihan_id,
+                'kunjungan_id' => $request->kunjungan_id,
+                'jenis_item'   => 'tindakan', // atau 'layanan'
+                'tarif_id'      => $request->tindakan_id,
+                'qty'          => $request->qty,
+                'harga'        => $request->harga,
+                'subtotal'     => $subtotal,
+                'created_at'   => now(),
+                'updated_at'   => now(),
+            ]);
+
+            // 3. Recalculate (Hitung Ulang) Total Tagihan Utama
+            $id_pembayaran = $request->tagihan_id;
+            $this->recalculateTotalTagihan($id_pembayaran);
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Tindakan berhasil ditambahkan ke tagihan.'
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal menambahkan tindakan: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Menambahkan item obat/alkes ke detail tagihan pasien.
+     */
+    public function tambahObat(Request $request)
+    {
+        $request->validate([
+            'tagihan_id'   => 'required',
+            'kunjungan_id' => 'required',
+            'obat_id'      => 'required',
+            'qty'          => 'required|numeric|min:1',
+            'harga'        => 'required|numeric|min:0',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            // 1. Ambil info obat dari master
+            $obat = DB::table('master_obats')->where('id', $request->obat_id)->first();
+
+            if (!$obat) {
+                return response()->json(['success' => false, 'message' => 'Data obat tidak ditemukan.'], 404);
+            }
+
+            // Opsional: Cek kecukupan stok
+            if (isset($obat->stok) && $obat->stok < $request->qty) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Stok obat tidak mencukupi. Sisa stok: ' . $obat->stok
+                ], 422);
+            }
+
+            $subtotal = $request->qty * $request->harga;
+
+            // 2. Insert ke tabel rincian/detail tagihan
+            DB::table('billing_details')->insert([
+                'pembayaran_id'   => $request->tagihan_id,
+                'kunjungan_id' => $request->kunjungan_id,
+                'jenis_item'   => 'obat',
+                'obat_id'      => $request->obat_id,
+                'qty'          => $request->qty,
+                'harga'        => $request->harga,
+                'subtotal'     => $subtotal,
+                'created_at'   => now(),
+                'updated_at'   => now(),
+            ]);
+
+            // 3. Potong stok obat (jika dipotong langsung dari kasir)
+            if (isset($obat->stok)) {
+                DB::table('master_obats')
+                    ->where('id', $request->obat_id)
+                    ->decrement('stok', $request->qty);
+            }
+
+            // 4. Recalculate (Hitung Ulang) Total Tagihan Utama
+            $this->recalculateTotalTagihan($request->tagihan_id);
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Obat berhasil ditambahkan ke tagihan.'
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal menambahkan obat: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Helper privat untuk memperbarui total nominal tagihan di tabel utama.
+     */
+    private function recalculateTotalTagihan($id_pembayaran)
+    {
+        $totalBaru = DB::table('billing_details')
+            ->where('id', $id_pembayaran)
+            ->sum('subtotal');
+
+        // Sesuaikan nama tabel tagihan utama Anda (misal: tagihan / kasir / pembayaran)
+        DB::table('pembayarans')
+            ->where('id', $id_pembayaran)
+            ->update([
+                'total_bayar' => $totalBaru,
+                'updated_at'    => now(),
+            ]);
     }
 }

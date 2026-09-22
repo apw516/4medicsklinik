@@ -88,6 +88,10 @@
                                         data-ihs="{{ $pasien->ihs_number }}" title="Edit">
                                         <i class="bi bi-pencil"></i>
                                     </button>
+                                    <a rm="{{ $pasien->id }}" nama="{{ $pasien->nama_lengkap }}"
+                                        class="btn btn-outline-danger hapuspasien" title="Hapus pasien ...">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
                                     <a rm="{{ $pasien->no_rm }}" class="btn btn-outline-success pilihpasien"
                                         title="Daftar Pelayanan">
                                         <i class="bi bi-arrow-right-square"></i>
@@ -234,6 +238,47 @@
                     $('.v_1').attr('hidden', true);
                     $('.v_2').removeAttr('hidden');
                     $('.v_formnya').html(response);
+                }
+            });
+        });
+        $(document).on('click', '.hapuspasien', function(event) {
+            let nama = $(this).attr('nama');
+            let rm = $(this).attr('rm');
+            Swal.fire({
+                title: "Anda yakin ?",
+                text: "Data pasien" + nama + " Akan dihapus ....!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Ya, Hapus pasien !"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: "{{ route('pasien.hapus') }}",
+                        type: "POST",
+                        data: {
+                            _token: "{{ csrf_token() }}",
+                            rm: rm,
+                        },
+                        success: function(response) {
+                            Swal.fire({
+                                position: "top-end",
+                                icon: "success",
+                                title: "Data pasien berhasil dihapus ...",
+                                showConfirmButton: false,
+                                timer: 1500
+                            });
+                            location.reload()
+                        },
+                        error: function(xhr) {
+                            let errorMsg = "Terjadi kesalahan.";
+                            if (xhr.responseJSON && xhr.responseJSON.message) {
+                                errorMsg = xhr.responseJSON.message;
+                            }
+                            alert(errorMsg);
+                        }
+                    });
                 }
             });
         });
