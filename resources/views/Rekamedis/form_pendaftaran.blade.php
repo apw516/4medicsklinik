@@ -286,6 +286,7 @@
 </div>
 <script>
     $(document).ready(function() {
+        spinneron()
         // Inisialisasi DataTables
         if (!$.fn.DataTable.isDataTable('#tableRiwayatPembayaran')) {
             $('#tableRiwayat').DataTable({
@@ -296,6 +297,7 @@
                 "ordering": true
             });
         }
+        spinneroff()
     });
     $(document).ready(function() {
         // 1. Tombol Kembali
@@ -334,9 +336,8 @@
         // Gunakan .off('click') untuk mencegah event terdaftar ganda
         $(document).off('click', '#btnSimpanPendaftaran').on('click', '#btnSimpanPendaftaran', function(e) {
             e.preventDefault();
-
+            spinneron()
             let btn = $(this);
-
             // Mencegah klik ganda jika tombol sedang dalam proses loading
             if (btn.is(':disabled')) {
                 return false;
@@ -362,6 +363,7 @@
                 dataType: "json",
                 success: function(response) {
                     alert('Pendaftaran Berhasil Disimpan!');
+                    spinneroff()
 
                     // Kembalikan tombol ke keadaan semula jika ada aksi modal/kembali
                     btn.prop('disabled', false).html(
@@ -383,8 +385,10 @@
                         $.each(errors, function(key, value) {
                             errorMsg += '- ' + value[0] + '\n';
                         });
+                        spinneroff()
                         alert(errorMsg);
                     } else {
+                        spinneroff()
                         let msg = xhr.responseJSON && xhr.responseJSON.message ?
                             xhr.responseJSON.message :
                             'Terjadi kesalahan saat menyimpan data pendaftaran.';

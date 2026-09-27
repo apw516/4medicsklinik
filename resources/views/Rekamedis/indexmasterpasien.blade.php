@@ -703,6 +703,7 @@
             $('.v_2').attr('hidden',true)
         }
         $(document).ready(function() {
+             spinneron()
             // 1. Ubah Provinsi -> Load Kab/Kota di Modal Tambah Pasien
             $('#add_provinsi_code').on('change', function() {
                 let provCode = $(this).val();
@@ -782,6 +783,7 @@
                     });
                 }
             });
+            spinneroff()
         });
     </script>
     <!-- Script Modal Get Master Wilayah Exiting -->
@@ -879,7 +881,7 @@
     </script>
     <script>
         $(document).ready(function() {
-
+            spinneron()
             // Fungsi Fetch Data via AJAX
             function fetchPasienData(url = "{{ route('caripasien') }}") {
                 let formData = $('#formFilterPasien').serialize();
@@ -934,7 +936,7 @@
                     fetchPasienData(pageUrl);
                 }
             });
-
+            spinneroff()
         });
     </script>
 @endsection

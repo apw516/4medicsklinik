@@ -8,12 +8,8 @@ use Illuminate\Support\Facades\URL;
 
 class AppServiceProvider extends ServiceProvider
 {
-    /**
-     * Register any application services.
-     */
     public function register(): void
     {
-        //
         $this->app->bind(SatuSehatService::class, function ($app) {
             $clientId = auth()->user()?->client_id;
             return new SatuSehatService($clientId);

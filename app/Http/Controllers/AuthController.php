@@ -6,8 +6,11 @@ use App\Models\Provinsi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
+use App\Models\UserLoginLog;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Jenssegers\Agent\Agent;
+use Stevebauman\Location\Facades\Location;
 
 class AuthController extends Controller
 {
@@ -55,9 +58,10 @@ class AuthController extends Controller
             'username.required' => 'Username wajib diisi.',
             'password.required' => 'Password wajib diisi.',
         ]);
-
+        $agent = new Agent();
         // Autentikasi ke database
         if (Auth::attempt($credentials)) {
+            $user = Auth::user();
             // 1. Cek jika status user TIDAK AKTIF (0 atau null)
             if (auth()->user()->status != 1) {
                 Auth::logout();
@@ -67,7 +71,24 @@ class AuthController extends Controller
                 return back()->with('error', 'Akun Anda belum diaktivasi. Silakan hubungi Administrator.')
                     ->onlyInput('username');
             }
+            $agent = new Agent();
+            $ip = $request->ip();
+            $location = Location::get($ip == '127.0.0.1' ? '180.252.80.1' : $ip);
 
+            // Simpan Log Login
+            UserLoginLog::create([
+                'user_id'     => $user->id,
+                'ip_address'  => $ip,
+                'city'        => $location ? $location->cityName : null,
+                'region'      => $location ? $location->regionName : null,
+                'country'     => $location ? $location->countryName : null,
+                'device_type' => $agent->isMobile() ? 'Mobile' : ($agent->isTablet() ? 'Tablet' : 'Desktop'),
+                'platform'    => $agent->platform(),
+                'browser'     => $agent->browser(),
+                'user_agent'  => $request->userAgent(),
+                'is_successful' => true,
+                'login_at'    => now(),
+            ]);
             return redirect()->intended('/dashboard')
                 ->with('success', 'Selamat datang kembali, ' . auth()->user()->nama . '!');
         }

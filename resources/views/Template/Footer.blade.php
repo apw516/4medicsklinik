@@ -28,8 +28,16 @@
 <script src="{{ asset('public/plugins/datatables-buttons/js/buttons.colVis.min.js') }}"></script>
 <!-- jsvectormap -->
 <script>
-    $(".preloader2").fadeOut();
-    spinner = $('#preloader2')
+    spinner = $('.preloader2')
+    $(".preloader2").fadeOut();   
+    function spinneron()
+    {
+        spinner.stop(true, true).fadeIn(200);
+    }
+    function spinneroff()
+    {
+        spinner.stop(true, true).fadeOut(200);
+    }
     function logout() {
         Swal.fire({
             title: "Anda yakin ingin Logout ?"

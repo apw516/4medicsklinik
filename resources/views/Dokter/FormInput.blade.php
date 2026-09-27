@@ -7,46 +7,7 @@
             <i class="bi bi-arrow-left me-1"></i> Kembali ke Tabel
         </button>
     </div>
-    <!-- Ringkasan Identitas Pasien & Status SATUSEHAT -->
-    {{-- <div class="card-body bg-light border-bottom">
-        <div class="row g-2 align-items-center">
-            <div class="col-md-2">
-                <small class="text-muted d-block">No. Rekam Medis</small>
-                <span class="fw-bold font-monospace fs-6 text-dark">{{ $pasien->no_rm }}</span>
-            </div>
-            <div class="col-md-3">
-                <small class="text-muted d-block">Nama Lengkap Pasien</small>
-                <span class="fw-bold text-dark">{{ $pasien->nama_lengkap ?? $pasien->nama }}</span>
-                ({{ $pasien->jenis_kelamin }})
-            </div>
-            <div class="col-md-3">
-                <small class="text-muted d-block">NIK / IHS SATUSEHAT</small>
-                <span class="fw-bold text-dark">{{ $pasien->nik }}</span> /
-                <span class="badge bg-info text-dark">{{ $pasien->ihs_number ?? 'Belum Bridging' }}</span>
-            </div>
-            <div class="col-md-4">
-                <small class="text-muted d-block">Status Encounter</small>
-                @if (isset($kunjungan) && !empty($kunjungan->satusehat_encounter_id))
-                    <span class="badge bg-success font-monospace" style="font-size: 0.75rem;">
-                        <i class="bi bi-check-circle me-1"></i> Terkirim
-                    </span>
-                    <div class="text-muted font-monospace lh-1 mt-1" style="font-size: 0.7rem;">
-                        ID: {{ $kunjungan->satusehat_encounter_id }}
-                    </div>
-                @else
-                    <div class="d-flex align-items-center gap-2 mt-1">
-                        <span class="badge bg-warning text-dark" style="font-size: 0.75rem;">
-                            <i class="bi bi-exclamation-triangle me-1"></i> Belum Dikirim
-                        </span>
-                        <button type="button" class="btn btn-xs btn-primary py-0 px-2" style="font-size: 0.7rem;"
-                            id="btnKirimEncounter" onclick="kirimEncounter('{{ $kunjungan->id ?? '' }}')">
-                            <i class="bi bi-send me-1"></i> Kirim
-                        </button>
-                    </div>
-                @endif
-            </div>
-        </div>
-    </div> --}}
+
     <div class="card-body bg-light border-bottom">
         <!-- INFORMASI UTAMA PASIEN -->
         <div class="row g-2 align-items-center mb-3">
@@ -713,6 +674,7 @@
     }
 
     function simpanErm(event) {
+        spinneron()
         event.preventDefault();
         let btn = $('#btnSimpanErm');
         btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-1"></span> Menyimpan...');
@@ -721,6 +683,7 @@
             type: "POST",
             data: $('#formSubmitErm').serialize(),
             success: function(response) {
+                spinneroff()
                 btn.prop('disabled', false).html(
                     '<i class="bi bi-save me-1"></i> Simpan ERM & Bridging Condition');
                 if (response.status) {
@@ -732,6 +695,7 @@
                 }
             },
             error: function(xhr) {
+                spinneroff()
                 btn.prop('disabled', false).html(
                     '<i class="bi bi-save me-1"></i> Simpan ERM & Bridging Condition');
                 alert('Terjadi kesalahan sistem saat menyimpan data ERM.');
