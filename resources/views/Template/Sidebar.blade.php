@@ -105,7 +105,7 @@
                         <li class="nav-item">
                             <a href="" class="nav-link @if ($menu == 'dashboard') active @endif">
                                 <i class="nav-icon bi bi-circle"></i>
-                                <p>Dashboard Semerusmart</p>
+                                <p>Dashboard 4medics</p>
                             </a>
                         </li>
                     </ul>
