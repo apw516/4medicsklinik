@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Jenssegers\Agent\Agent;
 use Stevebauman\Location\Facades\Location;
-
+use Stevebauman\Location\Drivers\IpApi;
 class AuthController extends Controller
 {
     public function index()
@@ -73,9 +73,10 @@ class AuthController extends Controller
             }
             $agent = new Agent();
             $ip = $request->ip();
-            $location = Location::get($ip == '127.0.0.1' ? '180.252.80.1' : $ip);
-
+            // $location = Location::get($ip == '127.0.0.1' ? '180.252.80.1' : $ip);
+            // $location = Location::driver(IpApi::class)->get($ip == '127.0.0.1' ? '180.252.80.1' : $ip);
             // Simpan Log Login
+            $location = Location::setDriver(new IpApi)->get($ip == '127.0.0.1' ? '180.252.80.1' : $ip);
             UserLoginLog::create([
                 'user_id'     => $user->id,
                 'ip_address'  => $ip,
