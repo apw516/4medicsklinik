@@ -209,7 +209,7 @@
                         </a>
                     </li>
                 @endif
-                @if(auth()->user()->nama == 'agyl')
+                @if(auth()->user()->nama == 'agylpw')
                 <li class="nav-header">RIWAYAT AKSES</li>
                 <li class="nav-item">
                     <a href="{{ route('indexmasteruser') }}"
