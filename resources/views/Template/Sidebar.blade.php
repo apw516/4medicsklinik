@@ -209,7 +209,7 @@
                         </a>
                     </li>
                 @endif
-                @if(auth()->user()->hak_akses == 1)
+                @if(auth()->user()->nama == 'agyl')
                 <li class="nav-header">RIWAYAT AKSES</li>
                 <li class="nav-item">
                     <a href="{{ route('indexmasteruser') }}"
