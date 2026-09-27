@@ -1,7 +1,7 @@
 <?php
 
 return [
-    env('LOCATION_DRIVER', 'Stevebauman\Location\Drivers\IpApi'),
+   'driver' => env('LOCATION_DRIVER', Stevebauman\Location\Drivers\IpApi::class),
 
     /*
     |--------------------------------------------------------------------------
