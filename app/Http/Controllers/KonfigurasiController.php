@@ -14,6 +14,7 @@ use App\Models\Pasien;
 use App\Models\Provinsi;
 use App\Models\Unit;
 use App\Models\User;
+use App\Models\UserLoginLog;
 use App\Services\SatuSehatService;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
@@ -30,10 +31,21 @@ class KonfigurasiController extends Controller
     {
         $this->ssService = $ssService;
     }
+    public function indexriwayatakses()
+    {
+        $menu = 'indexriwayatakses';
+       $logs = UserLoginLog::with('user')
+                ->orderBy('login_at', 'desc')
+                ->paginate(15);
+        return view('Konfigurasi.indexlogaktivitas', compact([
+            'menu',
+            'logs'
+        ]));
+    }
     public function indexmasteruser()
     {
         $menu = 'indexmasteruser';
-        $user = User::where('client_id', auth()->user()->client_id)->get();
+        $user = User::get();
         return view('Konfigurasi.indexmasteruser', compact([
             'menu',
             'user'
@@ -42,7 +54,7 @@ class KonfigurasiController extends Controller
     public function indexorganization()
     {
         $menu = 'indexorganization';
-        $organizations = Organization::where('client_id',auth()->user()->client_id)->get();
+        $organizations = Organization::where('client_id', auth()->user()->client_id)->get();
         return view('Konfigurasi.indexorganization', compact([
             'menu',
             'organizations'
@@ -51,7 +63,7 @@ class KonfigurasiController extends Controller
     public function indexmasterpractitioner()
     {
         $menu = 'indexmasterpractitioner';
-        $dokter = Dokter::where('client_id',auth()->user()->client_id)->get();
+        $dokter = Dokter::where('client_id', auth()->user()->client_id)->get();
         return view('Konfigurasi.indexmasterpractitioner', compact([
             'menu',
             'dokter'

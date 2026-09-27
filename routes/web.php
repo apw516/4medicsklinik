@@ -55,6 +55,7 @@ Route::get('/indexmastertarif', [DashboardController::class, 'indexmastertarif']
 Route::get('/indexmasterobat', [DashboardController::class, 'indexmasterobat'])->middleware('auth')->name('indexmasterobat');
 Route::get('/dashboard', [DashboardController::class, 'index'])->middleware('auth')->name('dashboard');
 
+Route::get('/indexriwayatakses', [KonfigurasiController::class, 'indexriwayatakses'])->middleware('auth')->name('indexriwayatakses');
 Route::get('/indexmasteruser', [KonfigurasiController::class, 'indexmasteruser'])->middleware('auth')->name('indexmasteruser');
 Route::get('/indexmasterpractitioner', [KonfigurasiController::class, 'indexmasterpractitioner'])->middleware('auth')->name('indexmasterpractitioner');
 Route::get('/indexorganization', [KonfigurasiController::class, 'indexorganization'])->middleware('auth')->name('indexorganization');

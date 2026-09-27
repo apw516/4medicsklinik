@@ -1,13 +1,15 @@
 <style>
     /* Custom Theme Sidebar Merah Pias */
     aside.app-sidebar.custom-red-sidebar {
-        background-color: #8b262a !important; /* Merah pias gelap agar teks putih kontras */
+        background-color: #8b262a !important;
+        /* Merah pias gelap agar teks putih kontras */
         color: #f8f9fa !important;
     }
 
     /* Penonjolan Area Logo Brand */
     aside.app-sidebar.custom-red-sidebar .sidebar-brand {
-        background-color: #6e1c20 !important; /* Latar lebih gelap untuk area brand */
+        background-color: #6e1c20 !important;
+        /* Latar lebih gelap untuk area brand */
         border-bottom: 1px solid rgba(255, 255, 255, 0.15);
         padding: 12px 15px;
         display: flex;
@@ -21,7 +23,8 @@
         justify-content: center;
         width: 100%;
         padding: 5px;
-        background: rgba(255, 255, 255, 0.08); /* Card pemanis di belakang logo */
+        background: rgba(255, 255, 255, 0.08);
+        /* Card pemanis di belakang logo */
         border-radius: 8px;
         transition: all 0.3s ease;
     }
@@ -34,12 +37,14 @@
         max-height: 45px;
         width: auto;
         object-fit: contain;
-        filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.4)); /* Efek shadow agar logo menonjol */
+        filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.4));
+        /* Efek shadow agar logo menonjol */
     }
 
     /* Styling Menu & Teks Sidebar */
     aside.app-sidebar.custom-red-sidebar .nav-header {
-        color: #f1aeb5 !important; /* Warna merah muda soft/pias untuk header section */
+        color: #f1aeb5 !important;
+        /* Warna merah muda soft/pias untuk header section */
         font-weight: 700;
         font-size: 0.75rem;
         letter-spacing: 0.8px;
@@ -47,12 +52,14 @@
     }
 
     aside.app-sidebar.custom-red-sidebar .nav-link {
-        color: #e9ecef !important; /* Teks putih gading agar kontras & jelas */
+        color: #e9ecef !important;
+        /* Teks putih gading agar kontras & jelas */
         font-weight: 500;
     }
 
     aside.app-sidebar.custom-red-sidebar .nav-link i {
-        color: #f8d7da !important; /* Icon warna soft red terang */
+        color: #f8d7da !important;
+        /* Icon warna soft red terang */
     }
 
     /* State Active & Hover pada Menu */
@@ -62,7 +69,8 @@
     }
 
     aside.app-sidebar.custom-red-sidebar .nav-link.active {
-        background-color: #d9534f !important; /* Merah pias terang untuk menu aktif */
+        background-color: #d9534f !important;
+        /* Merah pias terang untuk menu aktif */
         color: #ffffff !important;
         font-weight: 600;
         box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
@@ -92,7 +100,7 @@
             <!--begin::Sidebar Menu-->
             <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" role="navigation"
                 aria-label="Main navigation" data-accordion="false" id="navigation">
-                
+
                 <li class="nav-item @if ($menu == 'dashboard') menu-open @endif">
                     <a href="#" class="nav-link">
                         <i class="nav-icon bi bi-speedometer"></i>
@@ -127,7 +135,7 @@
                     </a>
                 </li>
 
-                @if(auth()->user()->hak_akses != 2)
+                @if (auth()->user()->hak_akses != 2)
                     <li class="nav-header">DOKTER</li>
                     <li class="nav-item">
                         <a href="{{ route('indexdokter') }}"
@@ -139,7 +147,7 @@
                 @endif
 
                 <li class="nav-header">KASIR & FARMASI</li>
-                @if(auth()->user()->hak_akses != 2)
+                @if (auth()->user()->hak_akses != 2)
                     <li class="nav-item">
                         <a href="{{ route('indexkasir') }}"
                             class="nav-link @if ($menu == 'indexdatapasienkasir') active @endif">
@@ -163,7 +171,7 @@
                     </a>
                 </li>
 
-                @if(auth()->user()->hak_akses != 2)
+                @if (auth()->user()->hak_akses != 2)
                     <li class="nav-header">DATA MASTER</li>
                     <li class="nav-item">
                         <a href="{{ route('indexmastertarif') }}"
@@ -200,15 +208,24 @@
                             <p>Master Practitioner</p>
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a href="{{ route('indexmasteruser') }}"
-                            class="nav-link @if ($menu == 'indexmasteruser') active @endif">
-                            <i class="nav-icon bi bi-file-bar-graph-fill"></i>
-                            <p>Master User</p>
-                        </a>
-                    </li>
                 @endif
-
+                @if(auth()->user()->hak_akses == 1)
+                <li class="nav-header">RIWAYAT AKSES</li>
+                <li class="nav-item">
+                    <a href="{{ route('indexmasteruser') }}"
+                        class="nav-link @if ($menu == 'indexmasteruser') active @endif">
+                        <i class="nav-icon bi bi-file-bar-graph-fill"></i>
+                        <p>Master User</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ route('indexriwayatakses') }}"
+                        class="nav-link @if ($menu == 'indexriwayatakses') active @endif">
+                        <i class="nav-icon bi bi-person-vcard"></i>
+                        <p class="text">Log aktivitas</p>
+                    </a>
+                </li>
+                @endif
                 <li class="nav-header">INFO AKUN</li>
                 <li class="nav-item">
                     <a href="{{ route('indexdetailakun') }}"
